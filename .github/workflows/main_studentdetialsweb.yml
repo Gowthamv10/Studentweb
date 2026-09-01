@@ -1,4 +1,4 @@
-name: Build and deploy ASP app to Azure Web App - studentdetialsweb
+name: Deploy HTML App to Azure Web App - studentdetialsweb
 
 on:
   push:
@@ -7,50 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish --configuration Release --output ./published --no-build
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ASP-app
-          path: ./published
-
   deploy:
     runs-on: ubuntu-latest
-    needs: build
 
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ASP-app
-          path: ./published
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -59,9 +25,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3183C3214EE343919DD49AE8406F6C55 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0AACA36311D64FABBBFE8280A295E1A5 }}
 
-      - name: Deploy to Azure Web App
+      - name: Deploy HTML/CSS to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'studentdetialsweb'
           slot-name: 'Production'
-          package: ./published
+          package: .
