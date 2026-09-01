@@ -1,5 +1,4 @@
 name: Build and deploy ASP app to Azure Web App - studentdetialsweb
-
 on:
   push:
     branches:
@@ -7,47 +6,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Publish
-        run: dotnet publish -c Release -o ./published --no-restore
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ASP-app
-          path: ./published
-
   deploy:
-    runs-on: windows-latest
-    needs: build
+    runs-on: ubuntu-latest
 
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ASP-app
-          path: ./published
-
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Login to Azure
         uses: azure/login@v2
         with:
